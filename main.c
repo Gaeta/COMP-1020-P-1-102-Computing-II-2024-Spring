@@ -1,6 +1,6 @@
 /** 
  * Created By: Donald Gaeta
- * Date: 2/08/24 @ 8:30PM
+ * Date: 2/23/24 @ 2:50pm
  * 
  * 
  * Copyright (c) 2024 Donald J Gaeta (Gaeta.me)
@@ -21,9 +21,9 @@
 */
 /***********************************************************
  * Author: Donald Gaeta
- * Date: 2/08/24
- * Effort: 1 hr
- * Purpose: Practice reversing string using pointers
+ * Date: 2/23/24
+ * Effort: 2 hr
+ * Purpose: Practice add two numbers represented as linked lists.
  ***********************************************************/
 
 #include <stdio.h>
@@ -38,60 +38,81 @@ struct node
 	Node* next;
 };
 
-// SUCCESS or failure of the function
+// SUCCESS or failure of the function :D
 typedef enum { FAILURE, SUCCESS } Result;
 
 //declare your function here.
+int head_insert(Node** head, int digit);
+void print_list(Node* head);
+void destroy_list(Node** head);
 int reverseList(Node** head);
+Node* list_sum(Node* head1, Node* head2);
 
 
-int main(int argc, char* argv[])
-{
-	Node* head = NULL;
-	int i;
-	Node* temp;
+// Pre provided code from the assignment
+int main() {
+    Node* head1 = NULL;
+    Node* head2 = NULL;
+    Node* head_sum = NULL;
 
-	//set up a test list with values 9->8->7->...->0
-	for (i = 0; i < 10; i++)
-	{
-		temp = (Node*)malloc(sizeof(Node));
-		if (temp == NULL)
-		{
-			printf("out of memory?\n");
-			exit(1);
-		}
-		temp->data = i;
-		temp->next = head;
-		head = temp;
-	}
+    head_insert(&head1, 9);
+    head_insert(&head1, 8);
+    head_insert(&head1, 1);
 
-    printf("***\nOriginal List\n");
-    // Check list before hand
-    temp = head;
-    while (temp != NULL)
-    {
-        printf("%d\n", temp->data);
-        temp = temp->next;
-    }
-    printf("***\n");
+    head_insert(&head2, 1);
+    head_insert(&head2, 1);
 
-	//call your function and then print the list.
-    if (reverseList(&head) == FAILURE)
-    {
-        printf("Failed to reverse list\n");
-        return 1;
-    }
 
-    printf("***\nReversed List\n");
-    temp = head;
-    while (temp != NULL)
-    {
-        printf("%d\n", temp->data);
-        temp = temp->next;
-    }
-    printf("***\n");
+    // Add the two numbers
+    head_sum = list_sum(head1, head2);
+
+    // Print the sum of the two numbers
+    printf("The sum of ");
+    print_list(head1);
+    printf(" + ");
+    print_list(head2);
+    printf(" = ");
+    print_list(head_sum);
+    printf("\n");
+
+    // Cleanup
+    destroy_list(&head1);
+    destroy_list(&head2);
+    destroy_list(&head_sum);
 
     return 0;
+}
+
+// Implement the head_insert function
+int head_insert(Node** head, int digit) {
+    Node* new_node = (Node*)malloc(sizeof(Node));
+    if (new_node == NULL) {
+        return -1; // Memory allocation failed
+    }
+    new_node->data = digit;
+    new_node->next = *head;
+    *head = new_node;
+    return SUCCESS;
+}
+
+// Implement the print_list function
+void print_list(Node* head) {
+    Node* current = head;
+    while (current != NULL) {
+        printf("%d", current->data);
+        current = current->next;
+    }
+}
+
+// Implement the destroy_list function
+void destroy_list(Node** head) {
+    Node* current = *head;
+    while (current != NULL) {
+        Node* next = current->next;
+        free(current);
+        current = next;
+    }
+    *head = NULL;
 }
 
 //Define your function here
@@ -110,4 +131,36 @@ int reverseList(Node** head)
     }
     *head = prev;
     return SUCCESS;
+}
+
+Node* list_sum(Node* head1, Node* head2) {
+    // reverseList(&head1);
+    // reverseList(&head2);
+
+    Node* sum_head = NULL;
+    int head1_sum = 0;
+    int head2_sum = 0;
+    int total_sum = 0;
+
+    while (head1 != NULL)
+    {
+        head1_sum = head1_sum * 10 + head1->data;
+        head1 = head1->next;
+    }
+
+    while (head2 != NULL)
+    {
+        head2_sum = head2_sum * 10 + head2->data;
+        head2 = head2->next;
+    }
+
+    total_sum = head1_sum + head2_sum;
+
+    while (total_sum > 0)
+    {
+        head_insert(&sum_head, total_sum % 10);
+        total_sum = total_sum / 10;
+    }
+
+    return sum_head;
 }
